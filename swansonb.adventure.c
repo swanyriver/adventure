@@ -72,6 +72,14 @@ int main(){
     int roomsSelected[NUM_ROOMS];
     GetMappedRandomRange(roomsSelected,NUM_ROOMS,0,NUM_NAMES-1);
 
+    //test
+    printf("original rooms:");
+    int i=0;
+    for(;i<NUM_ROOMS;i++){
+        printf("%d:%s,",roomsSelected[i],ROOM_NAMES[roomsSelected[i]]);
+    }
+    printf("\n");
+    //end test
 
     int room;
     for(room=0;room<NUM_ROOMS;room++){
@@ -89,6 +97,8 @@ int main(){
  *    exit: single room file created as specified in assignment
  ******************************************************************************/
 void CreateRoom(int type, int roomNum, int roomsSelected[]){
+
+    printf("%d: ",roomNum);
 
     //open file
 
@@ -111,10 +121,17 @@ void CreateRoom(int type, int roomNum, int roomsSelected[]){
     printf("\n");
     //endtest
 
-    GetMappedRandomArr(connections,numConnections,roomsSelected,NUM_ROOMS-1);
+    //GetMappedRandomArr(connections,numConnections,roomsSelected,NUM_ROOMS-1);
     roomsSelected[roomNum]= myRoom;
 
-    int connection=1;
+    //int i=0;
+    for(i=0;i<NUM_ROOMS;i++){
+        printf("%d:%s,",roomsSelected[i],ROOM_NAMES[roomsSelected[i]]);
+    }
+    printf("\n");
+
+
+    /*int connection=1;
     for(;connection<=numConnections;connection++){
         //printf(CONNECT,connection,ROOM_NAMES[connections[connection-1]]);
         printf("%d,",connections[connection-1]);
@@ -126,7 +143,7 @@ void CreateRoom(int type, int roomNum, int roomsSelected[]){
     //output roomtype
     printf(ROOM_TYPE,ROOM_TYPES[type]);
 
-    //close file
+    //close file*/
 }
 
 /******************************************************************************
