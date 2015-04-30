@@ -76,7 +76,7 @@ int main(){
     printf("original rooms:");
     int i=0;
     for(;i<NUM_ROOMS;i++){
-        printf("%d:%s,",roomsSelected[i],ROOM_NAMES[roomsSelected[i]]);
+        printf("%d:%s,",i,ROOM_NAMES[roomsSelected[i]]);
     }
     printf("\n");
     //end test
@@ -87,6 +87,15 @@ int main(){
         else if(room==end_room) CreateRoom(END,room,roomsSelected);
         else CreateRoom(MID,room,roomsSelected);
     }
+
+    //test
+    printf("now rooms:");
+
+    for(i=0;i<NUM_ROOMS;i++){
+        printf("%d:%s,",i,ROOM_NAMES[roomsSelected[i]]);
+    }
+    printf("\n");
+    //end test
 
     return 0;
 }
@@ -121,10 +130,9 @@ void CreateRoom(int type, int roomNum, int roomsSelected[]){
         }
     }
     GetMappedRandomArr(connections,numConnections,possibleConnections,NUM_ROOMS-1);
-
     //int i=0;
-    for(i=0;i<NUM_ROOMS;i++){
-        printf("%d:%s,",i,ROOM_NAMES[possibleConnections[i]]);
+    for(i=0;i<numConnections;i++){
+        printf("%d:%s,",i,ROOM_NAMES[connections[i]]);
     }
     printf("\n");
 
