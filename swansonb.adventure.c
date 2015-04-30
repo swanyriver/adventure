@@ -108,25 +108,23 @@ void CreateRoom(int type, int roomNum, int roomsSelected[]){
 
     //output n number of connections
     int numConnections = GetRandomInRange(MIN_CON,MAX_CON);
-    int connections[MAX_CON];
+    int connections[MAX_CON];  
 
-    //swap last room with current room to exclude a connection to oneself
-    roomsSelected[roomNum]=roomsSelected[NUM_ROOMS-1];
-
-    //test
+    //create array of available connections
+    int possibleConnections[MAX_CON];
     int i=0;
-    for(;i<NUM_ROOMS;i++){
-        printf("%d:%s,",roomsSelected[i],ROOM_NAMES[roomsSelected[i]]);
+    for(;i<NUM_ROOMS-1;i++){
+        if(i==roomNum){
+            possibleConnections[i]=roomsSelected[NUM_ROOMS-1];
+        } else {
+            possibleConnections[i]=roomsSelected[i];
+        }
     }
-    printf("\n");
-    //endtest
-
-    //GetMappedRandomArr(connections,numConnections,roomsSelected,NUM_ROOMS-1);
-    roomsSelected[roomNum]= myRoom;
+    GetMappedRandomArr(connections,numConnections,possibleConnections,NUM_ROOMS-1);
 
     //int i=0;
     for(i=0;i<NUM_ROOMS;i++){
-        printf("%d:%s,",roomsSelected[i],ROOM_NAMES[roomsSelected[i]]);
+        printf("%d:%s,",i,ROOM_NAMES[possibleConnections[i]]);
     }
     printf("\n");
 
@@ -201,6 +199,7 @@ void GetMappedRandomRange ( int valuesOut[] , const int numOut,
  *
  *    exit: array of unique copies from valuesIn
  *          (only unique values if valuesIn is all unique)
+ *          modifies values in
  *
  ******************************************************************************/
 void GetMappedRandomArr(int valuesOut[], const int numOut,
@@ -214,5 +213,4 @@ void GetMappedRandomArr(int valuesOut[], const int numOut,
         valuesIn[randindex]=valuesIn[numIn];
     }
 }
-
 
