@@ -40,9 +40,11 @@ const char * PATH = "YOUR PATH TO VICTORY WAS:";
 
 //prototypes
 int GetRandomInRange ( int min , int max );
-void GetMappedRandomInts ( int valuesOut[] , int rangeBegining ,
-      int rangeEnd , const int numGenerateValues, const int exclude );
-void CreateRoom(int type);
+void GetMappedRandomRange ( int valuesOut[] , const int numOut,
+        int rangeBegining, int rangeEnd);
+void GetMappedRandomArr(int valuesOut[], const int numOut,
+        int valuesIn[], int numIn );
+void CreateRoom(int type, int roomNum, int rooms[]);
 
 int main(){
 
@@ -65,12 +67,24 @@ int main(){
     }
 
     //create rooms
+
+    //TODO Make call to map range
+    //TODO test its still working
+    int i;
+    for (i=0;i<15;i++){
+        int testarr[8];
+        GetMappedRandomRange(testarr,6,1,8);
+        int v;
+        for(v=0;v<6;v++) printf("%d,",testarr[v]);
+        printf("\n");
+    }
+
     int room;
-    for(room=0;room<NUM_ROOMS;room++){
+   /* for(room=0;room<NUM_ROOMS;room++){
         if(room==start_room) CreateRoom(START);
         else if(room==end_room) CreateRoom(END);
         else CreateRoom(MID);
-    }
+    }*/
 
     return 0;
 }
@@ -80,14 +94,20 @@ int main(){
  *
  *    exit: single room file created as specified in assignment
  ******************************************************************************/
-void CreateRoom(int type){
+//TODO  will need to know its room number to exclude it from the others
+//TODO decide on function signature
+void CreateRoom(int type, int roomNum, int rooms[]){
     //open file
 
     //output file name
 
     //output n number of connections
     int numConnections = GetRandomInRange(MIN_CON,MAX_CON);
-    int connections[10];
+    int connections[MAX_CON];
+
+    //todo make call to random arr with exclusion array generated
+    //todo returned array will represent indicies of chosen array not room number
+    //GetMappedRandomInts(connections,)
 
 
     //output roomtype
@@ -97,6 +117,8 @@ void CreateRoom(int type){
 
 /******************************************************************************
  *    purpose:produce a random number
+ *
+ *    entry: max >= min
  *
  *    exit: random int in range [min,max]
  *
@@ -111,12 +133,13 @@ int GetRandomInRange ( int min , int max ) {
    random = (rand() % range) + min;
    return random;
 }
+
 /******************************************************************************
  *    purpose: produce an amount (numGeneratedValues) of numbers across a given
  *             range avoiding duplicate values
  *             excluding 1 value
  *
- *    entry: empty array of size numGenerateValues, rangeBegining<=rangeEnd,
+ *    entry: empty array of size numOut, rangeBegining<=rangeEnd,
  *           numGeneratedValues <= rangeEnd-rangeBegining
  *
  *    exit: an array of non repeated random values
@@ -124,27 +147,32 @@ int GetRandomInRange ( int min , int max ) {
  *    must create an array of size rangeEnd-rangeBegining, use for small amounts
  *
  ******************************************************************************/
-void GetMappedRandomInts ( int valuesOut[] , int rangeBegining ,
-      int rangeEnd , const int numGenerateValues, const int exclude) {
+void GetMappedRandomRange ( int valuesOut[] , const int numOut,
+        int rangeBegining, int rangeEnd) {
 
     //generate values to chose from
-    int poolSize = rangeEnd-rangeBegining;
+    int poolSize = rangeEnd-rangeBegining+1;
     int numPool[poolSize];
     int i;
     int val = rangeBegining;
     for (i=0; i<poolSize; i++){
-        if (val==exclude)val++;
         numPool[i]=val++;
     }
 
-    //chose n number from pool and place them in new array
-    for(i=0;i<numGenerateValues;i++){
-        int randindex = GetRandomInRange(0,--poolSize);
-        valuesOut[i]=numPool[randindex];
-        //overwrite chosen value replacing it with what was the last selectable value
-        numPool[randindex]=numPool[poolSize];
-    }
+    GetMappedRandomArr(valuesOut,numOut,numPool,poolSize);
 
+}
+
+void GetMappedRandomArr(int valuesOut[], const int numOut,
+        int valuesIn[], int numIn ){
+    //chose n number from pool and place them in new array
+    int i;
+    for(i=0;i<numOut;i++){
+        int randindex = GetRandomInRange(0,--numIn);
+        valuesOut[i]=valuesIn[randindex];
+        //overwrite chosen value replacing it with what was the last selectable value
+        valuesIn[randindex]=valuesIn[numIn];
+    }
 }
 
 
