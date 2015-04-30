@@ -16,7 +16,7 @@
 //constants/global
 pid_t MYPID;
 char DIRNAME[20];
-const int NUMNAMES = 10;
+const int NUM_NAMES = 10;
 const int NUM_ROOMS = 7;
 const int MIN_CON = 3;
 const int MAX_CON = 6;
@@ -41,7 +41,7 @@ const char * PATH = "YOUR PATH TO VICTORY WAS:";
 //prototypes
 int GetRandomInRange ( int min , int max );
 void GetMappedRandomInts ( int valuesOut[] , int rangeBegining ,
-      int rangeEnd , const int numGenerateValues );
+      int rangeEnd , const int numGenerateValues, const int exclude );
 void CreateRoom(int type);
 
 int main(){
@@ -64,19 +64,13 @@ int main(){
         end_room = end_room + 1 % (NUM_ROOMS-1);
     }
 
-    int testar[10];
-    GetMappedRandomInts(testar,4,20,10);
-   /* int i;
-    for (i=0;i<20;i++){
-        int testar[10];
-        GetMappedRandomInts(testar,1,15,10);
-        int v;
-        for(v=0;v<10;v++){printf("%d,",testar[v]);}
-        printf("\n");
+    //create rooms
+    int room;
+    for(room=0;room<NUM_ROOMS;room++){
+        if(room==start_room) CreateRoom(START);
+        else if(room==end_room) CreateRoom(END);
+        else CreateRoom(MID);
     }
-*/
-
-
 
     return 0;
 }
@@ -92,6 +86,9 @@ void CreateRoom(int type){
     //output file name
 
     //output n number of connections
+    int numConnections = GetRandomInRange(MIN_CON,MAX_CON);
+    int connections[10];
+
 
     //output roomtype
 
@@ -114,48 +111,29 @@ int GetRandomInRange ( int min , int max ) {
    random = (rand() % range) + min;
    return random;
 }
-
 /******************************************************************************
  *    purpose: produce an amount (numGeneratedValues) of numbers across a given
  *             range avoiding duplicate values
+ *             excluding 1 value
  *
- *    entry: empty array of size numGenerateValues, rangeBegining<=rangeEnd
+ *    entry: empty array of size numGenerateValues, rangeBegining<=rangeEnd,
+ *           numGeneratedValues <= rangeEnd-rangeBegining
  *
  *    exit: an array of non repeated random values
  *
- *    must create an array of size rangeEnd-rangeBegining+1, use for small amounts
+ *    must create an array of size rangeEnd-rangeBegining, use for small amounts
  *
  ******************************************************************************/
-/*void GetMappedRandomInts ( int valuesOut[] , int rangeBegining ,
-      int rangeEnd , const int numGenerateValues ) {
-
-    //generate values to chose from
-    int poolSize = rangeEnd-rangeBegining+1;
-    int numPool[poolSize];
-    int i;
-    for (i=0; i<poolSize; i++){
-        numPool[i]=i;
-    }
-
-    //chose n number from pool and place them in new array
-    for(i=0;i<numGenerateValues;i++){
-        int randindex = GetRandomInRange(0,--poolSize);
-        valuesOut[i]=numPool[randindex];
-        //overwrite chosen value replacing it with what was the last selectable value
-        numPool[randindex]=numPool[poolSize];
-    }
-
-}*/
-
 void GetMappedRandomInts ( int valuesOut[] , int rangeBegining ,
-      int rangeEnd , const int numGenerateValues ) {
+      int rangeEnd , const int numGenerateValues, const int exclude) {
 
     //generate values to chose from
-    int poolSize = rangeEnd-rangeBegining+1;
+    int poolSize = rangeEnd-rangeBegining;
     int numPool[poolSize];
     int i;
     int val = rangeBegining;
     for (i=0; i<poolSize; i++){
+        if (val==exclude)val++;
         numPool[i]=val++;
     }
 
@@ -165,15 +143,6 @@ void GetMappedRandomInts ( int valuesOut[] , int rangeBegining ,
         valuesOut[i]=numPool[randindex];
         //overwrite chosen value replacing it with what was the last selectable value
         numPool[randindex]=numPool[poolSize];
-
-        int v;
-        for(v=0;v<=i;v++){printf("%d,",valuesOut[v]);}
-        printf("  => ");
-        for(v=0;v<rangeEnd-rangeBegining+1;v++){
-            if(v==poolSize) printf(" / ");
-            printf("%d,",numPool[v]);
-        }
-        printf("\n");
     }
 
 }
