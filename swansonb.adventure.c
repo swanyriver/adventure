@@ -12,6 +12,7 @@
 #include <stdio.h>
 #include <time.h>
 #include <stdlib.h>
+#include <fcntl.h>
 
 //constants/global
 pid_t MYPID;
@@ -57,7 +58,7 @@ int main(){
     sprintf(DIRNAME,"swansonb.rooms.%d",MYPID);
 
     //create working directory and change to it
-    mkdir(DIRNAME, 777);
+    mkdir(DIRNAME, S_IRWXU | S_IRWXG | S_IROTH | S_IXOTH);
     chdir(DIRNAME);
 
     //chose start and end rooms
@@ -89,11 +90,13 @@ int main(){
  ******************************************************************************/
 void CreateRoom(int type, int roomNum, int roomsSelected[]){
 
+    int myRoom = roomsSelected[roomNum];
+
     //open file
+    FILE *roomFile = fopen(ROOM_NAMES[myRoom], "w");
 
     //output room name
-    int myRoom = roomsSelected[roomNum];
-    printf(ROOM,ROOM_NAMES[myRoom]);
+    fprintf( roomFile, ROOM,ROOM_NAMES[myRoom]);
 
     //output n number of connections
     int numConnections = GetRandomInRange(MIN_CON,MAX_CON);
@@ -114,13 +117,14 @@ void CreateRoom(int type, int roomNum, int roomsSelected[]){
 
     int connection=1;
     for(;connection<=numConnections;connection++){
-        printf(CONNECT,connection,ROOM_NAMES[connections[connection-1]]);
+        fprintf( roomFile, CONNECT,connection,ROOM_NAMES[connections[connection-1]]);
     }
 
     //output roomtype
-    printf(ROOM_TYPE,ROOM_TYPES[type]);
+    fprintf( roomFile, ROOM_TYPE,ROOM_TYPES[type]);
 
     //close file*/
+    fclose(roomFile);
 }
 
 /******************************************************************************
