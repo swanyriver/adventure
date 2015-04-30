@@ -24,9 +24,10 @@ const int MAX_CON = 6;
 
 //string constants
 const char * const ROOM_NAMES[] = { "Fred's Room","Music Room", "Darkroom", "Observatory", "Attic", "Dungeon", "Kitchen", "Tentacle's Room", "Ed's Room", "Front Porch"};
-const char * ROOM = "ROOM NAME: ";
-const char * CONNECT = "CONNECTION %d : ";
+const char * ROOM = "ROOM NAME: %s\n";
+const char * CONNECT = "CONNECTION %d : %s\n";
 const char * const ROOM_TYPES[] = {"START_ROOM", "END_ROOM", "MID_ROOM"};
+const char * ROOM_TYPE = "ROOM TYPE: %s\n";
 const int START = 0;
 const int MID = 2;
 const int END = 1;
@@ -44,7 +45,7 @@ void GetMappedRandomRange ( int valuesOut[] , const int numOut,
         int rangeBegining, int rangeEnd);
 void GetMappedRandomArr(int valuesOut[], const int numOut,
         int valuesIn[], int numIn );
-void CreateRoom(int type, int roomNum, int rooms[]);
+void CreateRoom(int type, int roomNum, int roomsSelected[]);
 
 int main(){
 
@@ -68,23 +69,16 @@ int main(){
 
     //create rooms
 
-    //TODO Make call to map range
-    //TODO test its still working
-    int i;
-    for (i=0;i<15;i++){
-        int testarr[8];
-        GetMappedRandomRange(testarr,6,1,8);
-        int v;
-        for(v=0;v<6;v++) printf("%d,",testarr[v]);
-        printf("\n");
-    }
+    int roomsSelected[NUM_ROOMS];
+    GetMappedRandomRange(roomsSelected,NUM_ROOMS,0,NUM_NAMES-1);
+
 
     int room;
-   /* for(room=0;room<NUM_ROOMS;room++){
-        if(room==start_room) CreateRoom(START);
-        else if(room==end_room) CreateRoom(END);
-        else CreateRoom(MID);
-    }*/
+    for(room=0;room<NUM_ROOMS;room++){
+        if(room==start_room) CreateRoom(START,room,roomsSelected);
+        else if(room==end_room) CreateRoom(END,room,roomsSelected);
+        else CreateRoom(MID,room,roomsSelected);
+    }
 
     return 0;
 }
@@ -94,23 +88,43 @@ int main(){
  *
  *    exit: single room file created as specified in assignment
  ******************************************************************************/
-//TODO  will need to know its room number to exclude it from the others
-//TODO decide on function signature
-void CreateRoom(int type, int roomNum, int rooms[]){
+void CreateRoom(int type, int roomNum, int roomsSelected[]){
+
     //open file
 
-    //output file name
+    //output room name
+    int myRoom = roomsSelected[roomNum];
+    printf(ROOM,ROOM_NAMES[myRoom]);
 
     //output n number of connections
     int numConnections = GetRandomInRange(MIN_CON,MAX_CON);
     int connections[MAX_CON];
 
-    //todo make call to random arr with exclusion array generated
-    //todo returned array will represent indicies of chosen array not room number
-    //GetMappedRandomInts(connections,)
+    //swap last room with current room to exclude a connection to oneself
+    roomsSelected[roomNum]=roomsSelected[NUM_ROOMS-1];
+
+    //test
+    int i=0;
+    for(;i<NUM_ROOMS;i++){
+        printf("%d:%s,",roomsSelected[i],ROOM_NAMES[roomsSelected[i]]);
+    }
+    printf("\n");
+    //endtest
+
+    GetMappedRandomArr(connections,numConnections,roomsSelected,NUM_ROOMS-1);
+    roomsSelected[roomNum]= myRoom;
+
+    int connection=1;
+    for(;connection<=numConnections;connection++){
+        //printf(CONNECT,connection,ROOM_NAMES[connections[connection-1]]);
+        printf("%d,",connections[connection-1]);
+    }
+    printf("\n");
+
 
 
     //output roomtype
+    printf(ROOM_TYPE,ROOM_TYPES[type]);
 
     //close file
 }
@@ -135,9 +149,8 @@ int GetRandomInRange ( int min , int max ) {
 }
 
 /******************************************************************************
- *    purpose: produce an amount (numGeneratedValues) of numbers across a given
+ *    purpose: produce an amount (numOut) of numbers across a given
  *             range avoiding duplicate values
- *             excluding 1 value
  *
  *    entry: empty array of size numOut, rangeBegining<=rangeEnd,
  *           numGeneratedValues <= rangeEnd-rangeBegining
@@ -163,6 +176,16 @@ void GetMappedRandomRange ( int valuesOut[] , const int numOut,
 
 }
 
+/******************************************************************************
+ *    purpose: randomly select numOut number of unique indices to fill
+ *             valuesOut from valuesIn
+ *
+ *    entry: empty array of size numOut,numOut<=NumIn
+ *
+ *    exit: array of unique copies from valuesIn
+ *          (only unique values if valuesIn is all unique)
+ *
+ ******************************************************************************/
 void GetMappedRandomArr(int valuesOut[], const int numOut,
         int valuesIn[], int numIn ){
     //chose n number from pool and place them in new array
