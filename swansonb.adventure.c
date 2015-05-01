@@ -24,7 +24,9 @@ const int MAX_CON = 6;
 
 
 //string constants
-const char * const ROOM_NAMES[] = { "Fred's Room","Music Room", "Darkroom", "Observatory", "Attic", "Dungeon", "Kitchen", "Tentacle's Room", "Ed's Room", "Front Porch"};
+const char * const ROOM_NAMES[] = { "Fred's Room","Music Room", "Darkroom",
+        "Observatory", "Attic", "Dungeon", "Kitchen", "Tentacle's Room",
+        "Ed's Room", "Front Porch"};
 const char * ROOM = "ROOM NAME: %s\n";
 const char * CONNECT = "CONNECTION %d : %s\n";
 const char * const ROOM_TYPES[] = {"START_ROOM", "END_ROOM", "MID_ROOM"};
@@ -39,6 +41,7 @@ const char * ERROR = "HUH? I DON’T UNDERSTAND THAT ROOM. TRY AGAIN.";
 const char * CONGRATS = "YOU HAVE FOUND THE END ROOM. CONGRATULATIONS!";
 const char * YOUTOOKNSTEPS = "YOU TOOK %d STEPS.";
 const char * PATH = "YOUR PATH TO VICTORY WAS:";
+const char * STARTFILE ="start";
 
 //prototypes
 int GetRandomInRange ( int min , int max );
@@ -47,6 +50,8 @@ void GetMappedRandomRange ( int valuesOut[] , const int numOut,
 void GetMappedRandomArr(int valuesOut[], const int numOut,
         int valuesIn[], int numIn );
 void CreateRoom(int type, int roomNum, int roomsSelected[]);
+char* displayRoomPrompt(char* roomName);
+int isEndRoom(char* roomName);
 
 int main(){
 
@@ -78,7 +83,24 @@ int main(){
         else CreateRoom(MID,room,roomsSelected);
     }
 
+    //find start room to present beginning of adventure
+    const int MAXBUFF = 30;
+    char nextRoom[MAXBUFF];
+    FILE *stfile = fopen(STARTFILE,"r");
 
+    int i=0;
+    for(;i<MAXBUFF;i++){
+        nextRoom[i]=43;
+    }
+    int readcount=fread(nextRoom,sizeof(char),MAXBUFF-1,stfile);
+    nextRoom[readcount] = '\0';
+    printf("First Room:%s\n",nextRoom);
+
+    /*do{
+        nextRoom = displayRoomPrompt(nextRoom);
+    }while(!isEndRoom(nextRoom));
+*/
+    //display winning message
 
     return 0;
 }
@@ -117,7 +139,8 @@ void CreateRoom(int type, int roomNum, int roomsSelected[]){
 
     int connection=1;
     for(;connection<=numConnections;connection++){
-        fprintf( roomFile, CONNECT,connection,ROOM_NAMES[connections[connection-1]]);
+        fprintf( roomFile, CONNECT,
+                connection,ROOM_NAMES[connections[connection-1]]);
     }
 
     //output roomtype
@@ -125,6 +148,21 @@ void CreateRoom(int type, int roomNum, int roomsSelected[]){
 
     //close file*/
     fclose(roomFile);
+
+    //make start room pointer
+    if(type == START){
+        roomFile = fopen(STARTFILE,"w");
+        fprintf(roomFile,"%s",ROOM_NAMES[myRoom]);
+        fclose(roomFile);
+    }
+}
+
+char* displayRoomPrompt(char* roomName){
+    return -1;
+}
+
+int isEndRoom(char* roomName){
+    return 0;
 }
 
 /******************************************************************************
