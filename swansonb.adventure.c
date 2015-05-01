@@ -183,10 +183,8 @@ void CreateRoom ( int type , int roomNum , int roomsSelected[] ) {
     /*output room name*/
     fprintf( roomFile , ROOM , ROOM_NAMES[roomNum] );
 
-    /*output n number of connections*/
+    /*create array of all available connections from 7 names selected excluding self*/
     numConnections = GetRandomInRange( MIN_CON , MAX_CON );
-
-    /*create array of available connections*/
     for ( i = 0 ; i < NUM_ROOMS - 1 ; i++ ) {
         if ( i == roomNum ) {
             possibleConnections[i] = roomsSelected[NUM_ROOMS - 1];
@@ -197,6 +195,7 @@ void CreateRoom ( int type , int roomNum , int roomsSelected[] ) {
     GetMappedRandomArr( connections , numConnections , possibleConnections ,
             NUM_ROOMS - 1 );
 
+    /*output possible connections*/
     for ( connection = 1 ; connection <= numConnections ; connection++ ) {
         fprintf( roomFile , CONNECT , connection ,
                 ROOM_NAMES[connections[connection - 1]] );
@@ -239,8 +238,13 @@ void displayRoomPrompt ( char* roomName ) {
     ///GET AND DISPLAY ROOM INFO /////////
     ////////////////////////////////////*/
 
-    /*output stream buffer*/
-
+    /*as the size of the prompt grows each call to snprintf is pointed to the new end of the string
+    *  prompt+psize,  and the max allowable writing is the original buffer - psize and minus 1 leaving
+    *  room for null terminator 
+    *
+    *  information read from file is read/parsed/and printed to string for easy re-printing when user
+    *   enters invalid input
+    */
     psize = 0;
     psize += snprintf( prompt + psize , MAXBUFF - psize - 1 , LOC , roomName );
     psize += snprintf( prompt + psize , MAXBUFF - psize - 1 , "%s" ,
@@ -252,18 +256,21 @@ void displayRoomPrompt ( char* roomName ) {
     readcount = fread( fileBuff , sizeof(char) , MAXBUFF - 1 , roomFile );
     fileBuff[readcount] = '\0';
 
+    /*use strtok to create an array of pointers the begining of each line, replacing '/n' with '/0'*/
     numLines = 0;
     lines[0] = strtok( fileBuff , "\n" );
     while ( lines[numLines] ) {
         lines[++numLines] = strtok( NULL , "\n" );
     }
 
-
+    /*display possible connections*/
     numConnections = numLines - 2;
     for ( i = 0 ; i < numConnections ; i++ ) {
-        connectNames[i] = strchr( lines[i + 1] , ':' ) + sizeof(char) * 2;
+        /*finds location of : char in line and points 2 characters advance*/
+        connectNames[i] = strchr( lines[i + 1] , ':' ) + 2;
         psize += snprintf( prompt + psize , MAXBUFF - psize - 1 ,
                 "%s" , connectNames[i] );
+        /*print punctuation*/
         if ( i == numConnections - 1 )
             psize += snprintf( prompt + psize , MAXBUFF - psize - 1 ,
                     "%s" , ".\n" );
@@ -272,10 +279,12 @@ void displayRoomPrompt ( char* roomName ) {
                     "%s" , ", " );
     }
 
+    /*print where to> prompt and terminate string*/
     psize += snprintf( prompt + psize , MAXBUFF - psize - 1 , "%s" , WHERE );
     prompt[psize + 1] = '\0';
 
     fclose( roomFile );
+
     /*////////////////////////////////////
     ///GET USERS NEXT STEP ///// /////////
     ////////////////////////////////////*/
@@ -335,11 +344,13 @@ int isEndRoom ( char* roomName ) {
 
     fclose(roomFile);
 
+    /*move pointer to end of file and decrement until pointing at :*/
     end = fileBuff + readcount;
     while ( *end != ':' )
         end--;
     end += 2;
 
+    /*compare last word of file with ROOM_TYPES[END]*/
     if ( strcmp( end , ROOM_TYPES[END] ) == 0 )
         return 1;
     else
@@ -359,9 +370,11 @@ int isEndRoom ( char* roomName ) {
 int GetRandomInRange ( int min , int max ) {
 
     int random;
+    /*calculate inclusive range size*/
     int range = max - min + 1;
     if ( range == 1 )
         return min;
+    /*map return 0-range onto min through max*/
     random = (rand() % range) + min;
     return random;
 }
@@ -390,6 +403,7 @@ void GetMappedRandomRange ( int valuesOut[] , const int numOut ,
         numPool[i] = val++;
     }
 
+    /*call with array flled with rangeBeginging to rangeEnd values*/
     GetMappedRandomArr( valuesOut , numOut , numPool , poolSize );
 
     free( numPool );
