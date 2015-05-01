@@ -40,8 +40,8 @@ const char * POSCONECT = "POSSIBLE CONNECTIONS: ";
 const char * WHERE = "WHERE TO? >";
 const char * ERROR = "\nHUH? I DON’T UNDERSTAND THAT ROOM. TRY AGAIN.\n";
 const char * CONGRATS = "YOU HAVE FOUND THE END ROOM. CONGRATULATIONS!";
-const char * YOUTOOKNSTEPS = "YOU TOOK %d STEPS.";
-const char * PATH = "YOUR PATH TO VICTORY WAS:";
+const char * YOUTOOKNSTEPS = "\nYOU TOOK %d STEPS. ";
+const char * PATH = "YOUR PATH TO VICTORY WAS:\n";
 const char * STARTFILE ="start";
 
 //prototypes
@@ -91,12 +91,28 @@ int main(){
     GetFirstRoom(nextRoom);
     //printf("first: %s\n",nextRoom);
 
+    int MAXPATH = 1200;
+    char PathRecord[MAXPATH];
+    char* sPos = PathRecord;
+    int steps =0;
+
     do{
         //next room is modified to users desired next step
         displayRoomPrompt(nextRoom);
+        steps++;
+
+        sPos += snprintf(sPos,MAXPATH -(sPos-PathRecord) - 1,
+                "%s\n",nextRoom);
+
     }while(!isEndRoom(nextRoom));
 
     //display winning message
+    printf("%s",CONGRATS);
+    printf(YOUTOOKNSTEPS, steps);
+    printf("%s",PATH);
+    *(sPos-1)=0;
+    printf("%s",PathRecord);
+
 
     return 0;
 }
