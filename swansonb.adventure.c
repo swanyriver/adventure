@@ -67,10 +67,12 @@ int main () {
     int start_room , end_room , room , steps, roomsSelected[NUM_ROOMS];
     char* sPos;
 
-
-
     /*initialize random*/
     srand( time( NULL ) );
+
+    /*/////////////////////////////////////////////////////
+    //////CREATE ROOM FILE SYSTEM /////////////////////////
+    /////////////////////////////////////////////////////*/
 
     /*set directory name*/
     MYPID = getpid();
@@ -80,14 +82,14 @@ int main () {
     mkdir( DIRNAME , S_IRWXU | S_IRWXG | S_IROTH | S_IXOTH );
     chdir( DIRNAME );
 
-    /*chose start and end rooms*/
+    /*randomly chose start and end rooms (index from 0-6)*/
     start_room = GetRandomInRange( 0 , NUM_ROOMS - 1 );
     end_room = GetRandomInRange( 0 , NUM_ROOMS - 1 );
     if ( end_room == start_room ) {
         end_room = end_room + 1 % (NUM_ROOMS - 1);
     }
 
-    /*create rooms*/
+    /*create rooms, from list of unique randoms for room names, assigning types*/
     GetMappedRandomRange( roomsSelected , NUM_ROOMS , 0 , NUM_NAMES - 1 );
     for ( room = 0; room < NUM_ROOMS ; room++ ) {
         if ( room == start_room )
@@ -106,6 +108,13 @@ int main () {
     sPos = PathRecord;
     steps = 0;
 
+
+    /*/////////////////////////////////////////////////////
+    // MAIN GAMEPLAY LOOOP ////////////////////////////////
+    //////read a file, display prompt, check input,   /////
+    //////return selection, break if that is end room//////
+    /////////////////////////////////////////////////////*/
+
     do {
         /*next room is modified to users desired next step*/
         displayRoomPrompt( nextRoom );
@@ -115,6 +124,11 @@ int main () {
                 nextRoom );
 
     } while ( !isEndRoom( nextRoom ) );
+
+
+    /*/////////////////////////////////////////////////////
+    //////GAME HAS BEEN WON ///////////////////////////////
+    /////////////////////////////////////////////////////*/
 
     /*display winning message*/
     printf( "%s" , CONGRATS );
@@ -126,6 +140,14 @@ int main () {
     return 0;
 }
 
+/******************************************************************************
+ *    purpose:find name of first room
+ *
+ *    entry: file STARTFILE exists and contains room name
+ *
+ *    exit: modifies char* output with filename/roomname of first room
+ *
+ ******************************************************************************/
 void GetFirstRoom ( char* output ) {
 
     FILE *stfile;
@@ -195,6 +217,15 @@ void CreateRoom ( int type , int roomNum , int roomsSelected[] ) {
     }
 }
 
+/******************************************************************************
+ *    purpose:read file specified by roomName and display connections and get user input
+ *
+ *    entry: file roomName exists and contains appropriate room data
+ *
+ *    exit: modifies char* roomName with users desired step 
+ *          (ensured to be one of possible connections)
+ *
+ ******************************************************************************/
 void displayRoomPrompt ( char* roomName ) {
 
     /*variable declarations*/
@@ -257,6 +288,14 @@ void displayRoomPrompt ( char* roomName ) {
 
 }
 
+/******************************************************************************
+ *    purpose:verify users input
+ *
+ *    entry: char* connections contains numConnection cstrings of possible connections
+ *
+ *    exit: true if selection is contained in connections[]
+ *
+ ******************************************************************************/
 int isConnection ( char* selection , char* connections[] , int numConnections ) {
 
     int i = 0;
@@ -273,6 +312,14 @@ int isConnection ( char* selection , char* connections[] , int numConnections ) 
     return 0;
 }
 
+/******************************************************************************
+ *    purpose:checks file to see if specified room is end of maze
+ *
+ *    entry: file roomName exists and contains appropriate room data
+ *
+ *    exit: true if last line contains string ROOM_TYPES[END]
+ *
+ ******************************************************************************/
 int isEndRoom ( char* roomName ) {
 
     /*variable declarations*/
