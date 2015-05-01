@@ -35,10 +35,10 @@ const char * ROOM_TYPE = "ROOM TYPE: %s\n";
 const int START = 0;
 const int MID = 2;
 const int END = 1;
-const char * LOC = "CURRENT LOCATION: %s\n";
-const char * POSCONECT = "POSSIBLE CONNECTIONS:";
-const char * PROMPT = "WHERE TO? >";
-const char * ERROR = "HUH? I DON’T UNDERSTAND THAT ROOM. TRY AGAIN.";
+const char * LOC = "\nCURRENT LOCATION: %s\n";
+const char * POSCONECT = "POSSIBLE CONNECTIONS: ";
+const char * WHERE = "WHERE TO? >";
+const char * ERROR = "\nHUH? I DON’T UNDERSTAND THAT ROOM. TRY AGAIN.\n";
 const char * CONGRATS = "YOU HAVE FOUND THE END ROOM. CONGRATULATIONS!";
 const char * YOUTOOKNSTEPS = "YOU TOOK %d STEPS.";
 const char * PATH = "YOUR PATH TO VICTORY WAS:";
@@ -94,8 +94,7 @@ int main(){
     do{
         //next room is modified to users desired next step
         displayRoomPrompt(nextRoom);
-    }while(0);
-    //}while(!isEndRoom(nextRoom));
+    }while(!isEndRoom(nextRoom));
 
     //display winning message
 
@@ -175,11 +174,11 @@ void displayRoomPrompt(char* roomName){
     char fileBuff[MAXBUFF];
 
     //output stream buffer
-    char userPrompt[MAXBUFF];
-    int promptSize = 0;
+    char prompt[MAXBUFF];
+    int psize = 0;
 
-    promptSize += snprintf(LOC,roomName);
-    printf("%s",POSCONECT);
+    psize += snprintf(prompt+psize,MAXBUFF-psize-1,LOC,roomName);
+    psize += snprintf(prompt+psize,MAXBUFF-psize-1,"%s",POSCONECT);
 
     //open roomfile for reading
     FILE* roomFile = fopen(roomName,"r");
@@ -198,22 +197,23 @@ void displayRoomPrompt(char* roomName){
     int numConnections = numLines - 2;
     int i=0;
     for(;i<numConnections;i++){
-        connectNames[i] = strchr(lines[i+1],':') + sizeof(char);
-        printf("%s",connectNames[i]);
-        if (i == numConnections-1) printf("%s",".\n");
-        else putchar(',');
+        connectNames[i] = strchr(lines[i+1],':') + sizeof(char)*2;
+        psize += snprintf(prompt+psize,MAXBUFF-psize-1,"%s",connectNames[i]);
+        if (i == numConnections-1) psize += snprintf(prompt+psize,MAXBUFF-psize-1,"%s",".\n");
+        else psize += snprintf(prompt+psize,MAXBUFF-psize-1,"%s",", ");
     }
 
-    printf("%s",PROMPT);
+    psize += snprintf(prompt+psize,MAXBUFF-psize-1,"%s",WHERE);
+    prompt[psize+1]='\0';
 
     fclose(roomFile);
     //////////////////////////////////////
     ///GET USERS NEXT STEP ///// /////////
     //////////////////////////////////////
     do{
+        printf("%s",prompt);
         fgets(roomName,RMNAMEBUFFSIZE,stdin);
-        roomName[strlen(roomName)]='\0'; //remove trailing '\n'
-        printf("read:%s",roomName);
+        roomName[strlen(roomName)-1]='\0'; //remove trailing '\n'
     }while(!isConnection(roomName,connectNames,numConnections));
 
 }
@@ -230,6 +230,7 @@ int isConnection(char* selection, char* connections[], int numConnections){
     }
 
     //no match found  //return false
+    printf("%s",ERROR);
     return 0;
 }
 
