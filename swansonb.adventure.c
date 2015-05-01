@@ -22,7 +22,6 @@ const int NUM_ROOMS = 7;
 const int MIN_CON = 3;
 const int MAX_CON = 6;
 const int RMNAMEBUFFSIZE=64;
-const char* NAMESCANF = "%63s";
 
 
 //string constants
@@ -171,12 +170,16 @@ void displayRoomPrompt(char* roomName){
     ///GET AND DISPLAY ROOM INFO /////////
     //////////////////////////////////////
 
-    printf(LOC,roomName);
-    printf("%s",POSCONECT);
-
     //file read buffer
     const int MAXBUFF = 300;
     char fileBuff[MAXBUFF];
+
+    //output stream buffer
+    char userPrompt[MAXBUFF];
+    int promptSize = 0;
+
+    promptSize += snprintf(LOC,roomName);
+    printf("%s",POSCONECT);
 
     //open roomfile for reading
     FILE* roomFile = fopen(roomName,"r");
@@ -208,8 +211,9 @@ void displayRoomPrompt(char* roomName){
     ///GET USERS NEXT STEP ///// /////////
     //////////////////////////////////////
     do{
-        int read = scanf(NAMESCANF,roomName);
-        roomName[read]='\0';
+        fgets(roomName,RMNAMEBUFFSIZE,stdin);
+        roomName[strlen(roomName)]='\0'; //remove trailing '\n'
+        printf("read:%s",roomName);
     }while(!isConnection(roomName,connectNames,numConnections));
 
 }
