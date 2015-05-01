@@ -235,7 +235,24 @@ int isConnection(char* selection, char* connections[], int numConnections){
 }
 
 int isEndRoom(char* roomName){
-    return 0;
+
+    //file read buffer
+    const int MAXBUFF = 300;
+    char fileBuff[MAXBUFF];
+
+    //open roomfile for reading
+    FILE* roomFile = fopen(roomName,"r");
+
+    int readcount=fread(fileBuff,sizeof(char),MAXBUFF-1,roomFile);
+    fileBuff[readcount-1] = '\0';
+
+    char* end = fileBuff+readcount;
+    while(*end!=':')end--;
+    end+=2;
+
+    if(strcmp(end,ROOM_TYPES[END])==0) return 1;
+    else return 0;
+
 }
 
 /******************************************************************************
