@@ -3,6 +3,8 @@
  *
  *  Created on: Apr 29, 2015
  *      Author: Brandon Swanson
+ *
+ *      conforms to ISO C90
  */
 
 #include <string.h>
@@ -15,13 +17,11 @@
 #include <fcntl.h>
 
 //constants/global
-pid_t MYPID;
-char DIRNAME[20];
-const int NUM_NAMES = 10;
-const int NUM_ROOMS = 7;
-const int MIN_CON = 3;
-const int MAX_CON = 6;
-const int RMNAMEBUFFSIZE=64;
+#define NUM_NAMES 10
+#define NUM_ROOMS 7
+#define MIN_CON 3
+#define MAX_CON 6
+#define RMNAMEBUFFSIZE 64
 
 
 //string constants
@@ -57,6 +57,9 @@ void GetFirstRoom(char* output);
 int isConnection(char* selection, char* connections[], int numConnections);
 
 int main(){
+
+    pid_t MYPID;
+    char DIRNAME[20];
 
     //initialize random
     srand(time(NULL));
@@ -230,6 +233,7 @@ void displayRoomPrompt(char* roomName){
         printf("%s",prompt);
         fgets(roomName,RMNAMEBUFFSIZE,stdin);
         roomName[strlen(roomName)-1]='\0'; //remove trailing '\n'
+        //todo check what happens when input overflows buff, is it picked up next time
     }while(!isConnection(roomName,connectNames,numConnections));
 
 }
@@ -307,7 +311,7 @@ void GetMappedRandomRange ( int valuesOut[] , const int numOut,
 
     //generate values to chose from
     int poolSize = rangeEnd-rangeBegining+1;
-    int numPool[poolSize];
+    int* numPool = malloc(poolSize * sizeof(int));
     int i;
     int val = rangeBegining;
     for (i=0; i<poolSize; i++){
@@ -315,6 +319,8 @@ void GetMappedRandomRange ( int valuesOut[] , const int numOut,
     }
 
     GetMappedRandomArr(valuesOut,numOut,numPool,poolSize);
+
+    free(numPool);
 
 }
 

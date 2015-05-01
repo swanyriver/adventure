@@ -1,67 +1,53 @@
-swansonb.adventure.c:17:1: warning: C++ style comments are not allowed in ISO C90 [enabled by default]
+swansonb.adventure.c:19:1: warning: C++ style comments are not allowed in ISO C90 [enabled by default]
  //constants/global
  ^
-swansonb.adventure.c:17:1: warning: (this will be reported only once per input file) [enabled by default]
+swansonb.adventure.c:19:1: warning: (this will be reported only once per input file) [enabled by default]
 swansonb.adventure.c: In function ‘main’:
-swansonb.adventure.c:73:5: warning: ISO C90 forbids mixed declarations and code [-Wpedantic]
+swansonb.adventure.c:76:5: warning: ISO C90 forbids mixed declarations and code [-Wpedantic]
      int start_room = GetRandomInRange(0,NUM_ROOMS-1);
      ^
-swansonb.adventure.c:80:5: warning: ISO C90 forbids variable length array ‘roomsSelected’ [-Wvla]
+swansonb.adventure.c:83:5: warning: ISO C90 forbids mixed declarations and code [-Wpedantic]
      int roomsSelected[NUM_ROOMS];
      ^
-swansonb.adventure.c:80:5: warning: ISO C90 forbids mixed declarations and code [-Wpedantic]
-swansonb.adventure.c:82:5: warning: ISO C90 forbids mixed declarations and code [-Wpedantic]
+swansonb.adventure.c:85:5: warning: ISO C90 forbids mixed declarations and code [-Wpedantic]
      int room;
      ^
-swansonb.adventure.c:90:5: warning: ISO C90 forbids variable length array ‘nextRoom’ [-Wvla]
+swansonb.adventure.c:93:5: warning: ISO C90 forbids mixed declarations and code [-Wpedantic]
      char nextRoom[RMNAMEBUFFSIZE];
      ^
-swansonb.adventure.c:90:5: warning: ISO C90 forbids mixed declarations and code [-Wpedantic]
-swansonb.adventure.c:94:5: warning: ISO C90 forbids mixed declarations and code [-Wpedantic]
+swansonb.adventure.c:97:5: warning: ISO C90 forbids mixed declarations and code [-Wpedantic]
      int MAXPATH = 1200;
      ^
-swansonb.adventure.c:95:5: warning: ISO C90 forbids variable length array ‘PathRecord’ [-Wvla]
+swansonb.adventure.c:98:5: warning: ISO C90 forbids variable length array ‘PathRecord’ [-Wvla]
      char PathRecord[MAXPATH];
      ^
 swansonb.adventure.c: In function ‘CreateRoom’:
-swansonb.adventure.c:146:5: warning: ISO C90 forbids mixed declarations and code [-Wpedantic]
+swansonb.adventure.c:149:5: warning: ISO C90 forbids mixed declarations and code [-Wpedantic]
      int numConnections = GetRandomInRange(MIN_CON,MAX_CON);
      ^
-swansonb.adventure.c:147:5: warning: ISO C90 forbids variable length array ‘connections’ [-Wvla]
-     int connections[MAX_CON];  
-     ^
-swansonb.adventure.c:150:5: warning: ISO C90 forbids variable length array ‘possibleConnections’ [-Wvla]
-     int possibleConnections[MAX_CON];
-     ^
-swansonb.adventure.c:162:5: warning: ISO C90 forbids mixed declarations and code [-Wpedantic]
+swansonb.adventure.c:165:5: warning: ISO C90 forbids mixed declarations and code [-Wpedantic]
      int connection=1;
      ^
 swansonb.adventure.c: In function ‘displayRoomPrompt’:
-swansonb.adventure.c:190:5: warning: ISO C90 forbids variable length array ‘fileBuff’ [-Wvla]
+swansonb.adventure.c:193:5: warning: ISO C90 forbids variable length array ‘fileBuff’ [-Wvla]
      char fileBuff[MAXBUFF];
      ^
-swansonb.adventure.c:193:5: warning: ISO C90 forbids variable length array ‘prompt’ [-Wvla]
+swansonb.adventure.c:196:5: warning: ISO C90 forbids variable length array ‘prompt’ [-Wvla]
      char prompt[MAXBUFF];
      ^
-swansonb.adventure.c:200:5: warning: ISO C90 forbids mixed declarations and code [-Wpedantic]
+swansonb.adventure.c:203:5: warning: ISO C90 forbids mixed declarations and code [-Wpedantic]
      FILE* roomFile = fopen(roomName,"r");
      ^
-swansonb.adventure.c:205:5: warning: ISO C90 forbids variable length array ‘lines’ [-Wvla]
+swansonb.adventure.c:208:5: warning: ISO C90 forbids mixed declarations and code [-Wpedantic]
      char* lines[MAX_CON+2];
      ^
-swansonb.adventure.c:205:5: warning: ISO C90 forbids mixed declarations and code [-Wpedantic]
-swansonb.adventure.c:212:5: warning: ISO C90 forbids variable length array ‘connectNames’ [-Wvla]
+swansonb.adventure.c:215:5: warning: ISO C90 forbids mixed declarations and code [-Wpedantic]
      char* connectNames[MAX_CON];
      ^
-swansonb.adventure.c:212:5: warning: ISO C90 forbids mixed declarations and code [-Wpedantic]
 swansonb.adventure.c: In function ‘isEndRoom’:
-swansonb.adventure.c:257:5: warning: ISO C90 forbids variable length array ‘fileBuff’ [-Wvla]
+swansonb.adventure.c:261:5: warning: ISO C90 forbids variable length array ‘fileBuff’ [-Wvla]
      char fileBuff[MAXBUFF];
      ^
-swansonb.adventure.c:265:5: warning: ISO C90 forbids mixed declarations and code [-Wpedantic]
+swansonb.adventure.c:269:5: warning: ISO C90 forbids mixed declarations and code [-Wpedantic]
      char* end = fileBuff+readcount;
-     ^
-swansonb.adventure.c: In function ‘GetMappedRandomRange’:
-swansonb.adventure.c:310:5: warning: ISO C90 forbids variable length array ‘numPool’ [-Wvla]
-     int numPool[poolSize];
      ^
