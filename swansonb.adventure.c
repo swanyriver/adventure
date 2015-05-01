@@ -16,21 +16,22 @@
 #include <stdlib.h>
 #include <fcntl.h>
 
-//constants/global
+//compile time constants (for setting array sizes)
 #define NUM_NAMES 10
 #define NUM_ROOMS 7
 #define MIN_CON 3
 #define MAX_CON 6
 #define RMNAMEBUFFSIZE 64
-
+#define DIRECTORYNAMEBUFF 32
+#define MAXPATH 1200
 
 //string constants
-const char * const ROOM_NAMES[] = { "Fred's Room","Music Room", "Darkroom",
+const char * const ROOM_NAMES[] = { "Fred's Room", "Music Room", "Darkroom",
         "Observatory", "Attic", "Dungeon", "Kitchen", "Tentacle's Room",
-        "Ed's Room", "Front Porch"};
+        "Ed's Room", "Front Porch" };
 const char * ROOM = "ROOM NAME: %s\n";
 const char * CONNECT = "CONNECTION %d : %s\n";
-const char * const ROOM_TYPES[] = {"START_ROOM", "END_ROOM", "MID_ROOM"};
+const char * const ROOM_TYPES[] = { "START_ROOM", "END_ROOM", "MID_ROOM" };
 const char * ROOM_TYPE = "ROOM TYPE: %s\n";
 const int START = 0;
 const int MID = 2;
@@ -42,91 +43,96 @@ const char * ERROR = "\nHUH? I DON’T UNDERSTAND THAT ROOM. TRY AGAIN.\n";
 const char * CONGRATS = "\nYOU HAVE FOUND THE END ROOM. CONGRATULATIONS!";
 const char * YOUTOOKNSTEPS = "\nYOU TOOK %d STEPS. ";
 const char * PATH = "YOUR PATH TO VICTORY WAS:\n";
-const char * STARTFILE ="start";
+const char * STARTFILE = "start";
 
 //prototypes
 int GetRandomInRange ( int min , int max );
-void GetMappedRandomRange ( int valuesOut[] , const int numOut,
-        int rangeBegining, int rangeEnd);
-void GetMappedRandomArr(int valuesOut[], const int numOut,
-        int valuesIn[], int numIn );
-void CreateRoom(int type, int roomNum, int roomsSelected[]);
-void displayRoomPrompt(char* roomName);
-int isEndRoom(char* roomName);
-void GetFirstRoom(char* output);
-int isConnection(char* selection, char* connections[], int numConnections);
+void GetMappedRandomRange ( int valuesOut[] , const int numOut ,
+        int rangeBegining , int rangeEnd );
+void GetMappedRandomArr ( int valuesOut[] , const int numOut , int valuesIn[] ,
+        int numIn );
+void CreateRoom ( int type , int roomNum , int roomsSelected[] );
+void displayRoomPrompt ( char* roomName );
+int isEndRoom ( char* roomName );
+void GetFirstRoom ( char* output );
+int isConnection ( char* selection , char* connections[] , int numConnections );
 
-int main(){
+int main () {
 
+    //variable declarations;
     pid_t MYPID;
-    char DIRNAME[20];
+    char DIRNAME[DIRECTORYNAMEBUFF] , nextRoom[RMNAMEBUFFSIZE] ,
+        PathRecord[MAXPATH];
+    int start_room , end_room , room , steps, roomsSelected[NUM_ROOMS];
+    char* sPos;
+
+
 
     //initialize random
-    srand(time(NULL));
+    srand( time( NULL ) );
 
     //set directory name
     MYPID = getpid();
-    sprintf(DIRNAME,"swansonb.rooms.%d",MYPID);
+    snprintf( DIRNAME , DIRECTORYNAMEBUFF , "swansonb.rooms.%d" , MYPID );
 
     //create working directory and change to it
-    mkdir(DIRNAME, S_IRWXU | S_IRWXG | S_IROTH | S_IXOTH);
-    chdir(DIRNAME);
+    mkdir( DIRNAME , S_IRWXU | S_IRWXG | S_IROTH | S_IXOTH );
+    chdir( DIRNAME );
 
     //chose start and end rooms
-    int start_room = GetRandomInRange(0,NUM_ROOMS-1);
-    int end_room = GetRandomInRange(0,NUM_ROOMS-1);
-    if(end_room == start_room){
-        end_room = end_room + 1 % (NUM_ROOMS-1);
+    start_room = GetRandomInRange( 0 , NUM_ROOMS - 1 );
+    end_room = GetRandomInRange( 0 , NUM_ROOMS - 1 );
+    if ( end_room == start_room ) {
+        end_room = end_room + 1 % (NUM_ROOMS - 1);
     }
 
     //create rooms
-    int roomsSelected[NUM_ROOMS];
-    GetMappedRandomRange(roomsSelected,NUM_ROOMS,0,NUM_NAMES-1);
-    int room;
-    for(room=0;room<NUM_ROOMS;room++){
-        if(room==start_room) CreateRoom(START,room,roomsSelected);
-        else if(room==end_room) CreateRoom(END,room,roomsSelected);
-        else CreateRoom(MID,room,roomsSelected);
+    GetMappedRandomRange( roomsSelected , NUM_ROOMS , 0 , NUM_NAMES - 1 );
+    for ( room = 0; room < NUM_ROOMS ; room++ ) {
+        if ( room == start_room )
+            CreateRoom( START , room , roomsSelected );
+        else if ( room == end_room )
+            CreateRoom( END , room , roomsSelected );
+        else
+            CreateRoom( MID , room , roomsSelected );
     }
 
     //find start room to present beginning of adventure
-    char nextRoom[RMNAMEBUFFSIZE];
-    GetFirstRoom(nextRoom);
-    //printf("first: %s\n",nextRoom);
+    GetFirstRoom( nextRoom );
 
-    int MAXPATH = 1200;
-    char PathRecord[MAXPATH];
-    char* sPos = PathRecord;
-    int steps =0;
 
-    do{
+    /*string pointer set to beginning of path char array, step count init */
+    sPos = PathRecord;
+    steps = 0;
+
+    do {
         //next room is modified to users desired next step
-        displayRoomPrompt(nextRoom);
+        displayRoomPrompt( nextRoom );
         steps++;
 
-        sPos += snprintf(sPos,MAXPATH -(sPos-PathRecord) - 1,
-                "%s\n",nextRoom);
+        sPos += snprintf( sPos , MAXPATH - (sPos - PathRecord) - 1 , "%s\n" ,
+                nextRoom );
 
-    }while(!isEndRoom(nextRoom));
+    } while ( !isEndRoom( nextRoom ) );
 
     //display winning message
-    printf("%s",CONGRATS);
-    printf(YOUTOOKNSTEPS, steps);
-    printf("%s",PATH);
-    *sPos='\0';  //null terminating path string
-    printf("%s",PathRecord);
-
+    printf( "%s" , CONGRATS );
+    printf( YOUTOOKNSTEPS , steps );
+    printf( "%s" , PATH );
+    *sPos = '\0';  //null terminating path string
+    printf( "%s" , PathRecord );
 
     return 0;
 }
 
-void GetFirstRoom(char* output){
+void GetFirstRoom ( char* output ) {
 
     //open pointer file
-    FILE *stfile = fopen(STARTFILE,"r");
+    FILE *stfile = fopen( STARTFILE , "r" );
 
     //read in roomname and null terminate it
-    int readcount=fread(output,sizeof(char),RMNAMEBUFFSIZE-1,stfile);
+    int readcount = fread( output , sizeof(char) , RMNAMEBUFFSIZE - 1 ,
+            stfile );
     output[readcount] = '\0';
 }
 
@@ -135,54 +141,54 @@ void GetFirstRoom(char* output){
  *
  *    exit: single room file created as specified in assignment
  ******************************************************************************/
-void CreateRoom(int type, int roomNum, int roomsSelected[]){
+void CreateRoom ( int type , int roomNum , int roomsSelected[] ) {
 
     int myRoom = roomsSelected[roomNum];
 
     //open file
-    FILE *roomFile = fopen(ROOM_NAMES[myRoom], "w");
+    FILE *roomFile = fopen( ROOM_NAMES[myRoom] , "w" );
 
     //output room name
-    fprintf( roomFile, ROOM,ROOM_NAMES[myRoom]);
+    fprintf( roomFile , ROOM , ROOM_NAMES[myRoom] );
 
     //output n number of connections
-    int numConnections = GetRandomInRange(MIN_CON,MAX_CON);
-    int connections[MAX_CON];  
+    int numConnections = GetRandomInRange( MIN_CON , MAX_CON );
+    int connections[MAX_CON];
 
     //create array of available connections
     int possibleConnections[MAX_CON];
-    int i=0;
-    for(;i<NUM_ROOMS-1;i++){
-        if(i==roomNum){
-            possibleConnections[i]=roomsSelected[NUM_ROOMS-1];
+    int i = 0;
+    for ( ; i < NUM_ROOMS - 1 ; i++ ) {
+        if ( i == roomNum ) {
+            possibleConnections[i] = roomsSelected[NUM_ROOMS - 1];
         } else {
-            possibleConnections[i]=roomsSelected[i];
+            possibleConnections[i] = roomsSelected[i];
         }
     }
-    GetMappedRandomArr(connections,numConnections,
-            possibleConnections,NUM_ROOMS-1);
+    GetMappedRandomArr( connections , numConnections , possibleConnections ,
+            NUM_ROOMS - 1 );
 
-    int connection=1;
-    for(;connection<=numConnections;connection++){
-        fprintf( roomFile, CONNECT,
-                connection,ROOM_NAMES[connections[connection-1]]);
+    int connection = 1;
+    for ( ; connection <= numConnections ; connection++ ) {
+        fprintf( roomFile , CONNECT , connection ,
+                ROOM_NAMES[connections[connection - 1]] );
     }
 
     //output roomtype
-    fprintf( roomFile, ROOM_TYPE,ROOM_TYPES[type]);
+    fprintf( roomFile , ROOM_TYPE , ROOM_TYPES[type] );
 
     //close file*/
-    fclose(roomFile);
+    fclose( roomFile );
 
     //make start room pointer
-    if(type == START){
-        roomFile = fopen(STARTFILE,"w");
-        fprintf(roomFile,"%s",ROOM_NAMES[myRoom]);
-        fclose(roomFile);
+    if ( type == START ) {
+        roomFile = fopen( STARTFILE , "w" );
+        fprintf( roomFile , "%s" , ROOM_NAMES[myRoom] );
+        fclose( roomFile );
     }
 }
 
-void displayRoomPrompt(char* roomName){
+void displayRoomPrompt ( char* roomName ) {
 
     //////////////////////////////////////
     ///GET AND DISPLAY ROOM INFO /////////
@@ -196,53 +202,59 @@ void displayRoomPrompt(char* roomName){
     char prompt[MAXBUFF];
     int psize = 0;
 
-    psize += snprintf(prompt+psize,MAXBUFF-psize-1,LOC,roomName);
-    psize += snprintf(prompt+psize,MAXBUFF-psize-1,"%s",POSCONECT);
+    psize += snprintf( prompt + psize , MAXBUFF - psize - 1 , LOC , roomName );
+    psize += snprintf( prompt + psize , MAXBUFF - psize - 1 , "%s" ,
+            POSCONECT );
 
     //open roomfile for reading
-    FILE* roomFile = fopen(roomName,"r");
+    FILE* roomFile = fopen( roomName , "r" );
 
-    int readcount=fread(fileBuff,sizeof(char),MAXBUFF-1,roomFile);
+    int readcount = fread( fileBuff , sizeof(char) , MAXBUFF - 1 , roomFile );
     fileBuff[readcount] = '\0';
 
-    char* lines[MAX_CON+2];
-    int numLines =0;
-    lines[0]=strtok(fileBuff,"\n");
-    while(lines[numLines]){
-        lines[++numLines]=strtok(NULL,"\n");
+    char* lines[MAX_CON + 2];
+    int numLines = 0;
+    lines[0] = strtok( fileBuff , "\n" );
+    while ( lines[numLines] ) {
+        lines[++numLines] = strtok( NULL , "\n" );
     }
 
     char* connectNames[MAX_CON];
     int numConnections = numLines - 2;
-    int i=0;
-    for(;i<numConnections;i++){
-        connectNames[i] = strchr(lines[i+1],':') + sizeof(char)*2;
-        psize += snprintf(prompt+psize,MAXBUFF-psize-1,"%s",connectNames[i]);
-        if (i == numConnections-1) psize += snprintf(prompt+psize,MAXBUFF-psize-1,"%s",".\n");
-        else psize += snprintf(prompt+psize,MAXBUFF-psize-1,"%s",", ");
+    int i = 0;
+    for ( ; i < numConnections ; i++ ) {
+        connectNames[i] = strchr( lines[i + 1] , ':' ) + sizeof(char) * 2;
+        psize += snprintf( prompt + psize , MAXBUFF - psize - 1 ,
+                "%s" , connectNames[i] );
+        if ( i == numConnections - 1 )
+            psize += snprintf( prompt + psize , MAXBUFF - psize - 1 ,
+                    "%s" , ".\n" );
+        else
+            psize += snprintf( prompt + psize , MAXBUFF - psize - 1 ,
+                    "%s" , ", " );
     }
 
-    psize += snprintf(prompt+psize,MAXBUFF-psize-1,"%s",WHERE);
-    prompt[psize+1]='\0';
+    psize += snprintf( prompt + psize , MAXBUFF - psize - 1 , "%s" , WHERE );
+    prompt[psize + 1] = '\0';
 
-    fclose(roomFile);
+    fclose( roomFile );
     //////////////////////////////////////
     ///GET USERS NEXT STEP ///// /////////
     //////////////////////////////////////
-    do{
-        printf("%s",prompt);
-        fgets(roomName,RMNAMEBUFFSIZE,stdin);
-        roomName[strlen(roomName)-1]='\0'; //remove trailing '\n'
+    do {
+        printf( "%s" , prompt );
+        fgets( roomName , RMNAMEBUFFSIZE , stdin );
+        roomName[strlen( roomName ) - 1] = '\0'; //remove trailing '\n'
         //todo check what happens when input overflows buff, is it picked up next time
-    }while(!isConnection(roomName,connectNames,numConnections));
+    } while ( !isConnection( roomName , connectNames , numConnections ) );
 
 }
 
-int isConnection(char* selection, char* connections[], int numConnections){
+int isConnection ( char* selection , char* connections[] , int numConnections ) {
 
-    int i=0;
-    for(;i<numConnections;i++){
-        if(strcmp(selection,connections[i])==0){
+    int i = 0;
+    for ( ; i < numConnections ; i++ ) {
+        if ( strcmp( selection , connections[i] ) == 0 ) {
             //user inputed string matches one of the connections
             //return true
             return 1;
@@ -250,28 +262,31 @@ int isConnection(char* selection, char* connections[], int numConnections){
     }
 
     //no match found  //return false
-    printf("%s",ERROR);
+    printf( "%s" , ERROR );
     return 0;
 }
 
-int isEndRoom(char* roomName){
+int isEndRoom ( char* roomName ) {
 
     //file read buffer
     const int MAXBUFF = 300;
     char fileBuff[MAXBUFF];
 
     //open roomfile for reading
-    FILE* roomFile = fopen(roomName,"r");
+    FILE* roomFile = fopen( roomName , "r" );
 
-    int readcount=fread(fileBuff,sizeof(char),MAXBUFF-1,roomFile);
-    fileBuff[readcount-1] = '\0';
+    int readcount = fread( fileBuff , sizeof(char) , MAXBUFF - 1 , roomFile );
+    fileBuff[readcount - 1] = '\0';
 
-    char* end = fileBuff+readcount;
-    while(*end!=':')end--;
-    end+=2;
+    char* end = fileBuff + readcount;
+    while ( *end != ':' )
+        end--;
+    end += 2;
 
-    if(strcmp(end,ROOM_TYPES[END])==0) return 1;
-    else return 0;
+    if ( strcmp( end , ROOM_TYPES[END] ) == 0 )
+        return 1;
+    else
+        return 0;
 
 }
 
@@ -286,12 +301,12 @@ int isEndRoom(char* roomName){
  ******************************************************************************/
 int GetRandomInRange ( int min , int max ) {
 
-   int random;
-   int range = max - min + 1;
-   if ( range == 1 )
-      return min;
-   random = (rand() % range) + min;
-   return random;
+    int random;
+    int range = max - min + 1;
+    if ( range == 1 )
+        return min;
+    random = (rand() % range) + min;
+    return random;
 }
 
 /******************************************************************************
@@ -306,21 +321,21 @@ int GetRandomInRange ( int min , int max ) {
  *    must create an array of size rangeEnd-rangeBegining, use for small amounts
  *
  ******************************************************************************/
-void GetMappedRandomRange ( int valuesOut[] , const int numOut,
-        int rangeBegining, int rangeEnd) {
+void GetMappedRandomRange ( int valuesOut[] , const int numOut ,
+        int rangeBegining , int rangeEnd ) {
 
     //generate values to chose from
-    int poolSize = rangeEnd-rangeBegining+1;
-    int* numPool = malloc(poolSize * sizeof(int));
+    int poolSize = rangeEnd - rangeBegining + 1;
+    int* numPool = malloc( poolSize * sizeof(int) );
     int i;
     int val = rangeBegining;
-    for (i=0; i<poolSize; i++){
-        numPool[i]=val++;
+    for ( i = 0; i < poolSize ; i++ ) {
+        numPool[i] = val++;
     }
 
-    GetMappedRandomArr(valuesOut,numOut,numPool,poolSize);
+    GetMappedRandomArr( valuesOut , numOut , numPool , poolSize );
 
-    free(numPool);
+    free( numPool );
 
 }
 
@@ -335,15 +350,15 @@ void GetMappedRandomRange ( int valuesOut[] , const int numOut,
  *          modifies values in
  *
  ******************************************************************************/
-void GetMappedRandomArr(int valuesOut[], const int numOut,
-        int valuesIn[], int numIn ){
+void GetMappedRandomArr ( int valuesOut[] , const int numOut , int valuesIn[] ,
+        int numIn ) {
     //chose n number from pool and place them in new array
     int i;
-    for(i=0;i<numOut;i++){
-        int randindex = GetRandomInRange(0,--numIn);
-        valuesOut[i]=valuesIn[randindex];
+    for ( i = 0; i < numOut ; i++ ) {
+        int randindex = GetRandomInRange( 0 , --numIn );
+        valuesOut[i] = valuesIn[randindex];
         //overwrite chosen value replacing it with what was the last selectable value
-        valuesIn[randindex]=valuesIn[numIn];
+        valuesIn[randindex] = valuesIn[numIn];
     }
 }
 
