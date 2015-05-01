@@ -24,6 +24,7 @@
 #define RMNAMEBUFFSIZE 64
 #define DIRECTORYNAMEBUFF 32
 #define MAXPATH 1200
+#define MAXBUFF 300
 
 //string constants
 const char * const ROOM_NAMES[] = { "Fred's Room", "Music Room", "Darkroom",
@@ -127,11 +128,14 @@ int main () {
 
 void GetFirstRoom ( char* output ) {
 
+    FILE *stfile;
+    int readcount;
+
     //open pointer file
-    FILE *stfile = fopen( STARTFILE , "r" );
+    stfile = fopen( STARTFILE , "r" );
 
     //read in roomname and null terminate it
-    int readcount = fread( output , sizeof(char) , RMNAMEBUFFSIZE - 1 ,
+    readcount = fread( output , sizeof(char) , RMNAMEBUFFSIZE - 1 ,
             stfile );
     output[readcount] = '\0';
 }
@@ -143,22 +147,23 @@ void GetFirstRoom ( char* output ) {
  ******************************************************************************/
 void CreateRoom ( int type , int roomNum , int roomsSelected[] ) {
 
-    int myRoom = roomsSelected[roomNum];
+    FILE *roomFile;
+    int myRoom , numConnections , connections[MAX_CON] , i , connection ,
+    possibleConnections[MAX_CON];
+
+    myRoom = roomsSelected[roomNum];
 
     //open file
-    FILE *roomFile = fopen( ROOM_NAMES[myRoom] , "w" );
+    roomFile = fopen( ROOM_NAMES[myRoom] , "w" );
 
     //output room name
     fprintf( roomFile , ROOM , ROOM_NAMES[myRoom] );
 
     //output n number of connections
-    int numConnections = GetRandomInRange( MIN_CON , MAX_CON );
-    int connections[MAX_CON];
+    numConnections = GetRandomInRange( MIN_CON , MAX_CON );
 
     //create array of available connections
-    int possibleConnections[MAX_CON];
-    int i = 0;
-    for ( ; i < NUM_ROOMS - 1 ; i++ ) {
+    for ( i = 0 ; i < NUM_ROOMS - 1 ; i++ ) {
         if ( i == roomNum ) {
             possibleConnections[i] = roomsSelected[NUM_ROOMS - 1];
         } else {
@@ -168,8 +173,7 @@ void CreateRoom ( int type , int roomNum , int roomsSelected[] ) {
     GetMappedRandomArr( connections , numConnections , possibleConnections ,
             NUM_ROOMS - 1 );
 
-    int connection = 1;
-    for ( ; connection <= numConnections ; connection++ ) {
+    for ( connection = 1 ; connection <= numConnections ; connection++ ) {
         fprintf( roomFile , CONNECT , connection ,
                 ROOM_NAMES[connections[connection - 1]] );
     }
@@ -190,39 +194,40 @@ void CreateRoom ( int type , int roomNum , int roomsSelected[] ) {
 
 void displayRoomPrompt ( char* roomName ) {
 
+    /*variable declarations*/
+    char fileBuff[MAXBUFF];     /*file read buffer */
+    char prompt[MAXBUFF];       /*output string buffer*/
+    char* lines[MAX_CON + 2];   /*pointer array for strtok divisions*/
+    char* connectNames[MAX_CON];/*pointer array for parsed room names*/
+    int psize , readcount , numLines , numConnections, i;
+    FILE* roomFile;
+
     //////////////////////////////////////
     ///GET AND DISPLAY ROOM INFO /////////
     //////////////////////////////////////
 
-    //file read buffer
-    const int MAXBUFF = 300;
-    char fileBuff[MAXBUFF];
-
     //output stream buffer
-    char prompt[MAXBUFF];
-    int psize = 0;
 
+    psize = 0;
     psize += snprintf( prompt + psize , MAXBUFF - psize - 1 , LOC , roomName );
     psize += snprintf( prompt + psize , MAXBUFF - psize - 1 , "%s" ,
             POSCONECT );
 
     //open roomfile for reading
-    FILE* roomFile = fopen( roomName , "r" );
+    roomFile = fopen( roomName , "r" );
 
-    int readcount = fread( fileBuff , sizeof(char) , MAXBUFF - 1 , roomFile );
+    readcount = fread( fileBuff , sizeof(char) , MAXBUFF - 1 , roomFile );
     fileBuff[readcount] = '\0';
 
-    char* lines[MAX_CON + 2];
-    int numLines = 0;
+    numLines = 0;
     lines[0] = strtok( fileBuff , "\n" );
     while ( lines[numLines] ) {
         lines[++numLines] = strtok( NULL , "\n" );
     }
 
-    char* connectNames[MAX_CON];
-    int numConnections = numLines - 2;
-    int i = 0;
-    for ( ; i < numConnections ; i++ ) {
+
+    numConnections = numLines - 2;
+    for ( i = 0 ; i < numConnections ; i++ ) {
         connectNames[i] = strchr( lines[i + 1] , ':' ) + sizeof(char) * 2;
         psize += snprintf( prompt + psize , MAXBUFF - psize - 1 ,
                 "%s" , connectNames[i] );
@@ -268,17 +273,19 @@ int isConnection ( char* selection , char* connections[] , int numConnections ) 
 
 int isEndRoom ( char* roomName ) {
 
-    //file read buffer
-    const int MAXBUFF = 300;
-    char fileBuff[MAXBUFF];
+    /*variable declarations*/
+    char fileBuff[MAXBUFF]; /*file read buffer*/
+    FILE* roomFile;
+    int readcount;
+    char* end;
 
     //open roomfile for reading
-    FILE* roomFile = fopen( roomName , "r" );
+    roomFile = fopen( roomName , "r" );
 
-    int readcount = fread( fileBuff , sizeof(char) , MAXBUFF - 1 , roomFile );
+    readcount = fread( fileBuff , sizeof(char) , MAXBUFF - 1 , roomFile );
     fileBuff[readcount - 1] = '\0';
 
-    char* end = fileBuff + readcount;
+    end = fileBuff + readcount;
     while ( *end != ':' )
         end--;
     end += 2;

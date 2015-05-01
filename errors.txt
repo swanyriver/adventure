@@ -2,33 +2,3 @@ swansonb.adventure.c:19:1: warning: C++ style comments are not allowed in ISO C9
  //compile time constants (for setting array sizes)
  ^
 swansonb.adventure.c:19:1: warning: (this will be reported only once per input file) [enabled by default]
-swansonb.adventure.c: In function ‘CreateRoom’:
-swansonb.adventure.c:155:5: warning: ISO C90 forbids mixed declarations and code [-Wpedantic]
-     int numConnections = GetRandomInRange( MIN_CON , MAX_CON );
-     ^
-swansonb.adventure.c:171:5: warning: ISO C90 forbids mixed declarations and code [-Wpedantic]
-     int connection = 1;
-     ^
-swansonb.adventure.c: In function ‘displayRoomPrompt’:
-swansonb.adventure.c:199:5: warning: ISO C90 forbids variable length array ‘fileBuff’ [-Wvla]
-     char fileBuff[MAXBUFF];
-     ^
-swansonb.adventure.c:202:5: warning: ISO C90 forbids variable length array ‘prompt’ [-Wvla]
-     char prompt[MAXBUFF];
-     ^
-swansonb.adventure.c:210:5: warning: ISO C90 forbids mixed declarations and code [-Wpedantic]
-     FILE* roomFile = fopen( roomName , "r" );
-     ^
-swansonb.adventure.c:215:5: warning: ISO C90 forbids mixed declarations and code [-Wpedantic]
-     char* lines[MAX_CON + 2];
-     ^
-swansonb.adventure.c:222:5: warning: ISO C90 forbids mixed declarations and code [-Wpedantic]
-     char* connectNames[MAX_CON];
-     ^
-swansonb.adventure.c: In function ‘isEndRoom’:
-swansonb.adventure.c:273:5: warning: ISO C90 forbids variable length array ‘fileBuff’ [-Wvla]
-     char fileBuff[MAXBUFF];
-     ^
-swansonb.adventure.c:281:5: warning: ISO C90 forbids mixed declarations and code [-Wpedantic]
-     char* end = fileBuff + readcount;
-     ^
