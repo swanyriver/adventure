@@ -93,11 +93,11 @@ int main () {
     GetMappedRandomRange( roomsSelected , NUM_ROOMS , 0 , NUM_NAMES - 1 );
     for ( room = 0; room < NUM_ROOMS ; room++ ) {
         if ( room == start_room )
-            CreateRoom( START , room , roomsSelected );
+            CreateRoom( START , roomsSelected[room] , roomsSelected );
         else if ( room == end_room )
-            CreateRoom( END , room , roomsSelected );
+            CreateRoom( END , roomsSelected[room] , roomsSelected );
         else
-            CreateRoom( MID , room , roomsSelected );
+            CreateRoom( MID , roomsSelected[room] , roomsSelected );
     }
 
     /*find start room to present beginning of adventure*/
@@ -161,6 +161,7 @@ void GetFirstRoom ( char* output ) {
             stfile );
     output[readcount] = '\0';
 
+    /*close and remove startfile */
     fclose(stfile);
     remove(STARTFILE);
 }
@@ -173,16 +174,14 @@ void GetFirstRoom ( char* output ) {
 void CreateRoom ( int type , int roomNum , int roomsSelected[] ) {
 
     FILE *roomFile;
-    int myRoom , numConnections , connections[MAX_CON] , i , connection ,
+    int numConnections , connections[MAX_CON] , i , connection ,
     possibleConnections[MAX_CON];
 
-    myRoom = roomsSelected[roomNum];
-
     /*open file*/
-    roomFile = fopen( ROOM_NAMES[myRoom] , "w" );
+    roomFile = fopen( ROOM_NAMES[roomNum] , "w" );
 
     /*output room name*/
-    fprintf( roomFile , ROOM , ROOM_NAMES[myRoom] );
+    fprintf( roomFile , ROOM , ROOM_NAMES[roomNum] );
 
     /*output n number of connections*/
     numConnections = GetRandomInRange( MIN_CON , MAX_CON );
@@ -212,7 +211,7 @@ void CreateRoom ( int type , int roomNum , int roomsSelected[] ) {
     /*make start room pointer*/
     if ( type == START ) {
         roomFile = fopen( STARTFILE , "w" );
-        fprintf( roomFile , "%s" , ROOM_NAMES[myRoom] );
+        fprintf( roomFile , "%s" , ROOM_NAMES[roomNum] );
         fclose( roomFile );
     }
 }
