@@ -89,7 +89,7 @@ int main () {
         end_room = end_room + 1 % (NUM_ROOMS - 1);
     }
 
-    /*create rooms, from list of unique randoms for room names, assigning types*/
+    /*create rooms, from list of unique random indexes, assigning types*/
     GetMappedRandomRange( roomsSelected , NUM_ROOMS , 0 , NUM_NAMES - 1 );
     for ( room = 0; room < NUM_ROOMS ; room++ ) {
         if ( room == start_room )
@@ -183,7 +183,8 @@ void CreateRoom ( int type , int roomNum , int roomsSelected[] ) {
     /*output room name*/
     fprintf( roomFile , ROOM , ROOM_NAMES[roomNum] );
 
-    /*create array of all available connections from 7 names selected excluding self*/
+    /*create array of all available connections from 7 names selected
+     * excluding self*/
     numConnections = GetRandomInRange( MIN_CON , MAX_CON );
     for ( i = 0 ; i < NUM_ROOMS - 1 ; i++ ) {
         if ( i == roomNum ) {
@@ -216,7 +217,8 @@ void CreateRoom ( int type , int roomNum , int roomsSelected[] ) {
 }
 
 /******************************************************************************
- *    purpose:read file specified by roomName and display connections and get user input
+ *    purpose:read file specified by roomName and display connections and get
+ *              user input
  *
  *    entry: file roomName exists and contains appropriate room data
  *
@@ -238,12 +240,12 @@ void displayRoomPrompt ( char* roomName ) {
     ///GET AND DISPLAY ROOM INFO /////////
     ////////////////////////////////////*/
 
-    /*as the size of the prompt grows each call to snprintf is pointed to the new end of the string
-    *  prompt+psize,  and the max allowable writing is the original buffer - psize and minus 1 leaving
-    *  room for null terminator 
-    *
-    *  information read from file is read/parsed/and printed to string for easy re-printing when user
-    *   enters invalid input
+    /*as the size of the prompt grows each call to snprintf is pointed to the
+     * new end of the string prompt+psize,  and the max allowable writing is:
+     *  the original buffer - psize and minus 1 leaving room for null terminator
+     *
+     *  information read from file is read/parsed/and printed to string for
+     *  easy re-printing when user enters invalid input
     */
     psize = 0;
     psize += snprintf( prompt + psize , MAXBUFF - psize - 1 , LOC , roomName );
@@ -256,7 +258,8 @@ void displayRoomPrompt ( char* roomName ) {
     readcount = fread( fileBuff , sizeof(char) , MAXBUFF - 1 , roomFile );
     fileBuff[readcount] = '\0';
 
-    /*use strtok to create an array of pointers the begining of each line, replacing '/n' with '/0'*/
+    /*use strtok to create an array of pointers the begining of each line,
+     * replacing '/n' with '/0'*/
     numLines = 0;
     lines[0] = strtok( fileBuff , "\n" );
     while ( lines[numLines] ) {
@@ -299,12 +302,14 @@ void displayRoomPrompt ( char* roomName ) {
 /******************************************************************************
  *    purpose:verify users input
  *
- *    entry: char* connections contains numConnection cstrings of possible connections
+ *    entry: char* connections contains numConnection cstrings of possible
+ *                  connections
  *
  *    exit: true if selection is contained in connections[]
  *
  ******************************************************************************/
-int isConnection ( char* selection , char* connections[] , int numConnections ) {
+int isConnection ( char* selection , char* connections[] , int numConnections )
+{
 
     int i = 0;
     for ( ; i < numConnections ; i++ ) {
@@ -365,7 +370,8 @@ int isEndRoom ( char* roomName ) {
  *
  *    exit: random int in range [min,max]
  *
- *    Written by Brandon Swanson during Summer Term 2014 @ Oregon State University
+ *    Written by Brandon Swanson during Summer Term 2014
+ *     @ Oregon State University
  ******************************************************************************/
 int GetRandomInRange ( int min , int max ) {
 
@@ -428,7 +434,8 @@ void GetMappedRandomArr ( int valuesOut[] , const int numOut , int valuesIn[] ,
     for ( i = 0; i < numOut ; i++ ) {
         int randindex = GetRandomInRange( 0 , --numIn );
         valuesOut[i] = valuesIn[randindex];
-        /*overwrite chosen value replacing it with what was the last selectable value*/
+        /*overwrite chosen value replacing it with what was the last
+         * selectable value*/
         valuesIn[randindex] = valuesIn[numIn];
     }
 }
