@@ -1,4 +1,0 @@
-swansonb.adventure.c:19:1: warning: C++ style comments are not allowed in ISO C90 [enabled by default]
- //compile time constants (for setting array sizes)
- ^
-swansonb.adventure.c:19:1: warning: (this will be reported only once per input file) [enabled by default]

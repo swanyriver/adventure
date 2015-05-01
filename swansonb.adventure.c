@@ -16,7 +16,7 @@
 #include <stdlib.h>
 #include <fcntl.h>
 
-//compile time constants (for setting array sizes)
+/*compile time constants (for setting array sizes)*/
 #define NUM_NAMES 10
 #define NUM_ROOMS 7
 #define MIN_CON 3
@@ -26,7 +26,7 @@
 #define MAXPATH 1200
 #define MAXBUFF 300
 
-//string constants
+/*string constants*/
 const char * const ROOM_NAMES[] = { "Fred's Room", "Music Room", "Darkroom",
         "Observatory", "Attic", "Dungeon", "Kitchen", "Tentacle's Room",
         "Ed's Room", "Front Porch" };
@@ -46,7 +46,7 @@ const char * YOUTOOKNSTEPS = "\nYOU TOOK %d STEPS. ";
 const char * PATH = "YOUR PATH TO VICTORY WAS:\n";
 const char * STARTFILE = "start";
 
-//prototypes
+/*prototypes*/
 int GetRandomInRange ( int min , int max );
 void GetMappedRandomRange ( int valuesOut[] , const int numOut ,
         int rangeBegining , int rangeEnd );
@@ -60,7 +60,7 @@ int isConnection ( char* selection , char* connections[] , int numConnections );
 
 int main () {
 
-    //variable declarations;
+    /*variable declarations;*/
     pid_t MYPID;
     char DIRNAME[DIRECTORYNAMEBUFF] , nextRoom[RMNAMEBUFFSIZE] ,
         PathRecord[MAXPATH];
@@ -69,25 +69,25 @@ int main () {
 
 
 
-    //initialize random
+    /*initialize random*/
     srand( time( NULL ) );
 
-    //set directory name
+    /*set directory name*/
     MYPID = getpid();
     snprintf( DIRNAME , DIRECTORYNAMEBUFF , "swansonb.rooms.%d" , MYPID );
 
-    //create working directory and change to it
+    /*create working directory and change to it*/
     mkdir( DIRNAME , S_IRWXU | S_IRWXG | S_IROTH | S_IXOTH );
     chdir( DIRNAME );
 
-    //chose start and end rooms
+    /*chose start and end rooms*/
     start_room = GetRandomInRange( 0 , NUM_ROOMS - 1 );
     end_room = GetRandomInRange( 0 , NUM_ROOMS - 1 );
     if ( end_room == start_room ) {
         end_room = end_room + 1 % (NUM_ROOMS - 1);
     }
 
-    //create rooms
+    /*create rooms*/
     GetMappedRandomRange( roomsSelected , NUM_ROOMS , 0 , NUM_NAMES - 1 );
     for ( room = 0; room < NUM_ROOMS ; room++ ) {
         if ( room == start_room )
@@ -98,7 +98,7 @@ int main () {
             CreateRoom( MID , room , roomsSelected );
     }
 
-    //find start room to present beginning of adventure
+    /*find start room to present beginning of adventure*/
     GetFirstRoom( nextRoom );
 
 
@@ -107,7 +107,7 @@ int main () {
     steps = 0;
 
     do {
-        //next room is modified to users desired next step
+        /*next room is modified to users desired next step*/
         displayRoomPrompt( nextRoom );
         steps++;
 
@@ -116,11 +116,11 @@ int main () {
 
     } while ( !isEndRoom( nextRoom ) );
 
-    //display winning message
+    /*display winning message*/
     printf( "%s" , CONGRATS );
     printf( YOUTOOKNSTEPS , steps );
     printf( "%s" , PATH );
-    *sPos = '\0';  //null terminating path string
+    *sPos = '\0';  /*null terminating path string*/
     printf( "%s" , PathRecord );
 
     return 0;
@@ -131,10 +131,10 @@ void GetFirstRoom ( char* output ) {
     FILE *stfile;
     int readcount;
 
-    //open pointer file
+    /*open pointer file*/
     stfile = fopen( STARTFILE , "r" );
 
-    //read in roomname and null terminate it
+    /*read in roomname and null terminate it*/
     readcount = fread( output , sizeof(char) , RMNAMEBUFFSIZE - 1 ,
             stfile );
     output[readcount] = '\0';
@@ -153,16 +153,16 @@ void CreateRoom ( int type , int roomNum , int roomsSelected[] ) {
 
     myRoom = roomsSelected[roomNum];
 
-    //open file
+    /*open file*/
     roomFile = fopen( ROOM_NAMES[myRoom] , "w" );
 
-    //output room name
+    /*output room name*/
     fprintf( roomFile , ROOM , ROOM_NAMES[myRoom] );
 
-    //output n number of connections
+    /*output n number of connections*/
     numConnections = GetRandomInRange( MIN_CON , MAX_CON );
 
-    //create array of available connections
+    /*create array of available connections*/
     for ( i = 0 ; i < NUM_ROOMS - 1 ; i++ ) {
         if ( i == roomNum ) {
             possibleConnections[i] = roomsSelected[NUM_ROOMS - 1];
@@ -178,13 +178,13 @@ void CreateRoom ( int type , int roomNum , int roomsSelected[] ) {
                 ROOM_NAMES[connections[connection - 1]] );
     }
 
-    //output roomtype
+    /*output roomtype to file*/
     fprintf( roomFile , ROOM_TYPE , ROOM_TYPES[type] );
 
-    //close file*/
+    /*close file*/
     fclose( roomFile );
 
-    //make start room pointer
+    /*make start room pointer*/
     if ( type == START ) {
         roomFile = fopen( STARTFILE , "w" );
         fprintf( roomFile , "%s" , ROOM_NAMES[myRoom] );
@@ -202,18 +202,18 @@ void displayRoomPrompt ( char* roomName ) {
     int psize , readcount , numLines , numConnections, i;
     FILE* roomFile;
 
-    //////////////////////////////////////
+    /*////////////////////////////////////
     ///GET AND DISPLAY ROOM INFO /////////
-    //////////////////////////////////////
+    ////////////////////////////////////*/
 
-    //output stream buffer
+    /*output stream buffer*/
 
     psize = 0;
     psize += snprintf( prompt + psize , MAXBUFF - psize - 1 , LOC , roomName );
     psize += snprintf( prompt + psize , MAXBUFF - psize - 1 , "%s" ,
             POSCONECT );
 
-    //open roomfile for reading
+    /*open roomfile for reading*/
     roomFile = fopen( roomName , "r" );
 
     readcount = fread( fileBuff , sizeof(char) , MAXBUFF - 1 , roomFile );
@@ -243,14 +243,14 @@ void displayRoomPrompt ( char* roomName ) {
     prompt[psize + 1] = '\0';
 
     fclose( roomFile );
-    //////////////////////////////////////
+    /*////////////////////////////////////
     ///GET USERS NEXT STEP ///// /////////
-    //////////////////////////////////////
+    ////////////////////////////////////*/
     do {
         printf( "%s" , prompt );
         fgets( roomName , RMNAMEBUFFSIZE , stdin );
-        roomName[strlen( roomName ) - 1] = '\0'; //remove trailing '\n'
-        //todo check what happens when input overflows buff, is it picked up next time
+        roomName[strlen( roomName ) - 1] = '\0'; /*remove trailing '\n' */
+        /*todo check what happens when input overflows buff, is it picked up next time*/
     } while ( !isConnection( roomName , connectNames , numConnections ) );
 
 }
@@ -260,13 +260,13 @@ int isConnection ( char* selection , char* connections[] , int numConnections ) 
     int i = 0;
     for ( ; i < numConnections ; i++ ) {
         if ( strcmp( selection , connections[i] ) == 0 ) {
-            //user inputed string matches one of the connections
-            //return true
+            /*user inputed string matches one of the connections*/
+            /*return true*/
             return 1;
         }
     }
 
-    //no match found  //return false
+    /*no match found  //return false*/
     printf( "%s" , ERROR );
     return 0;
 }
@@ -279,7 +279,7 @@ int isEndRoom ( char* roomName ) {
     int readcount;
     char* end;
 
-    //open roomfile for reading
+    /*open roomfile for reading*/
     roomFile = fopen( roomName , "r" );
 
     readcount = fread( fileBuff , sizeof(char) , MAXBUFF - 1 , roomFile );
@@ -331,7 +331,7 @@ int GetRandomInRange ( int min , int max ) {
 void GetMappedRandomRange ( int valuesOut[] , const int numOut ,
         int rangeBegining , int rangeEnd ) {
 
-    //generate values to chose from
+    /*generate values to chose from*/
     int poolSize = rangeEnd - rangeBegining + 1;
     int* numPool = malloc( poolSize * sizeof(int) );
     int i;
@@ -359,12 +359,12 @@ void GetMappedRandomRange ( int valuesOut[] , const int numOut ,
  ******************************************************************************/
 void GetMappedRandomArr ( int valuesOut[] , const int numOut , int valuesIn[] ,
         int numIn ) {
-    //chose n number from pool and place them in new array
+    /*chose n number from pool and place them in new array*/
     int i;
     for ( i = 0; i < numOut ; i++ ) {
         int randindex = GetRandomInRange( 0 , --numIn );
         valuesOut[i] = valuesIn[randindex];
-        //overwrite chosen value replacing it with what was the last selectable value
+        /*overwrite chosen value replacing it with what was the last selectable value*/
         valuesIn[randindex] = valuesIn[numIn];
     }
 }
