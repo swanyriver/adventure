@@ -21,6 +21,7 @@ const int NUM_NAMES = 10;
 const int NUM_ROOMS = 7;
 const int MIN_CON = 3;
 const int MAX_CON = 6;
+const int RMNAMEBUFFSIZE=64;
 
 
 //string constants
@@ -34,8 +35,8 @@ const char * ROOM_TYPE = "ROOM TYPE: %s\n";
 const int START = 0;
 const int MID = 2;
 const int END = 1;
-const char * LOC = "CURRENT LOCATION: ";
-const char * POSCONECT = "POSSIBLE CONNECTIONS: ";
+const char * LOC = "CURRENT LOCATION: %s\n";
+const char * POSCONECT = "POSSIBLE CONNECTIONS:";
 const char * PROMPT = "WHERE TO? >";
 const char * ERROR = "HUH? I DON’T UNDERSTAND THAT ROOM. TRY AGAIN.";
 const char * CONGRATS = "YOU HAVE FOUND THE END ROOM. CONGRATULATIONS!";
@@ -50,9 +51,9 @@ void GetMappedRandomRange ( int valuesOut[] , const int numOut,
 void GetMappedRandomArr(int valuesOut[], const int numOut,
         int valuesIn[], int numIn );
 void CreateRoom(int type, int roomNum, int roomsSelected[]);
-char* displayRoomPrompt(char* roomName);
+void displayRoomPrompt(char* roomName);
 int isEndRoom(char* roomName);
-int GetFirstRoom();
+void GetFirstRoom(char* output);
 
 int main(){
 
@@ -85,38 +86,29 @@ int main(){
     }
 
     //find start room to present beginning of adventure
-    char* nextRoom = ROOM_NAMES[GetFirstRoom()];
-    printf("first: %s\n",nextRoom);
+    char nextRoom[RMNAMEBUFFSIZE];
+    GetFirstRoom(nextRoom);
+    //printf("first: %s\n",nextRoom);
 
-   /* do{
-        nextRoom = displayRoomPrompt(nextRoom);
-    }while(!isEndRoom(nextRoom));*/
+    do{
+        //next room is modified to users desired next step
+        displayRoomPrompt(nextRoom);
+    }while(0);
+    //}while(!isEndRoom(nextRoom));
 
     //display winning message
 
     return 0;
 }
 
-int GetFirstRoom(){
-    const int MAXBUFF = 30;
-    char nextRoom[MAXBUFF];
+void GetFirstRoom(char* output){
+
+    //open pointer file
     FILE *stfile = fopen(STARTFILE,"r");
 
-    int i=0;
-    for(;i<MAXBUFF;i++){
-        nextRoom[i]=43;
-    }
-    int readcount=fread(nextRoom,sizeof(char),MAXBUFF-1,stfile);
-    nextRoom[readcount] = '\0';
-
-    for(i=0;i<NUM_NAMES;i++){
-        if(strcmp(nextRoom,ROOM_NAMES[i])==0){
-            return i;
-        }
-    }
-
-    return -1;
-
+    //read in roomname and null terminate it
+    int readcount=fread(output,sizeof(char),RMNAMEBUFFSIZE-1,stfile);
+    output[readcount] = '\0';
 }
 
 /******************************************************************************
@@ -171,8 +163,45 @@ void CreateRoom(int type, int roomNum, int roomsSelected[]){
     }
 }
 
-char* displayRoomPrompt(char* roomName){
-    return -1;
+void displayRoomPrompt(char* roomName){
+
+    //////////////////////////////////////
+    ///GET AND DISPLAY ROOM INFO /////////
+    //////////////////////////////////////
+
+    printf(LOC,roomName);
+    printf("%s",POSCONECT);
+
+    //file read buffer
+    const int MAXBUFF = 300;
+    char fileBuff[MAXBUFF];
+
+    //open roomfile for reading
+    FILE* roomFile = fopen(roomName,"r");
+
+    int readcount=fread(fileBuff,sizeof(char),MAXBUFF-1,roomFile);
+    fileBuff[readcount] = '\0';
+
+    char* lines[MAX_CON+2];
+    int numLines =0;
+    lines[0]=strtok(fileBuff,"\n");
+    while(lines[numLines]){
+        lines[++numLines]=strtok(NULL,"\n");
+    }
+
+    int i=1;
+    for(;i<numLines-1;i++){
+        printf("%s",strchr(lines[i],':')+1);
+        if (i == numLines-2) printf("%s",".\n");
+        else putchar(',');
+    }
+
+    printf("%s",PROMPT);
+
+    //////////////////////////////////////
+    ///GET USERS NEXT STEP ///// /////////
+    /////////////////////////////////////
+
 }
 
 int isEndRoom(char* roomName){
