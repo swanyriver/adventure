@@ -110,7 +110,7 @@ int main(){
     printf("%s",CONGRATS);
     printf(YOUTOOKNSTEPS, steps);
     printf("%s",PATH);
-    *(sPos-1)=0;
+    *sPos='\0';  //null terminating path string
     printf("%s",PathRecord);
 
 
