@@ -22,6 +22,7 @@ const int NUM_ROOMS = 7;
 const int MIN_CON = 3;
 const int MAX_CON = 6;
 const int RMNAMEBUFFSIZE=64;
+const char* NAMESCANF = "%63s";
 
 
 //string constants
@@ -54,6 +55,7 @@ void CreateRoom(int type, int roomNum, int roomsSelected[]);
 void displayRoomPrompt(char* roomName);
 int isEndRoom(char* roomName);
 void GetFirstRoom(char* output);
+int isConnection(char* selection, char* connections[], int numConnections);
 
 int main(){
 
@@ -205,12 +207,27 @@ void displayRoomPrompt(char* roomName){
     //////////////////////////////////////
     ///GET USERS NEXT STEP ///// /////////
     //////////////////////////////////////
-
-
+    do{
+        int read = scanf(NAMESCANF,roomName);
+        roomName[read]='\0';
+    }while(!isConnection(roomName,connectNames,numConnections));
 
 }
 
-//int isConnection()
+int isConnection(char* selection, char* connections[], int numConnections){
+
+    int i=0;
+    for(;i<numConnections;i++){
+        if(strcmp(selection,connections[i])==0){
+            //user inputed string matches one of the connections
+            //return true
+            return 1;
+        }
+    }
+
+    //no match found  //return false
+    return 0;
+}
 
 int isEndRoom(char* roomName){
     return 0;
