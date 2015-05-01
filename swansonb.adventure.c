@@ -52,6 +52,7 @@ void GetMappedRandomArr(int valuesOut[], const int numOut,
 void CreateRoom(int type, int roomNum, int roomsSelected[]);
 char* displayRoomPrompt(char* roomName);
 int isEndRoom(char* roomName);
+int GetFirstRoom();
 
 int main(){
 
@@ -84,6 +85,19 @@ int main(){
     }
 
     //find start room to present beginning of adventure
+    char* nextRoom = ROOM_NAMES[GetFirstRoom()];
+    printf("first: %s\n",nextRoom);
+
+   /* do{
+        nextRoom = displayRoomPrompt(nextRoom);
+    }while(!isEndRoom(nextRoom));*/
+
+    //display winning message
+
+    return 0;
+}
+
+int GetFirstRoom(){
     const int MAXBUFF = 30;
     char nextRoom[MAXBUFF];
     FILE *stfile = fopen(STARTFILE,"r");
@@ -94,15 +108,15 @@ int main(){
     }
     int readcount=fread(nextRoom,sizeof(char),MAXBUFF-1,stfile);
     nextRoom[readcount] = '\0';
-    printf("First Room:%s\n",nextRoom);
 
-    /*do{
-        nextRoom = displayRoomPrompt(nextRoom);
-    }while(!isEndRoom(nextRoom));
-*/
-    //display winning message
+    for(i=0;i<NUM_NAMES;i++){
+        if(strcmp(nextRoom,ROOM_NAMES[i])==0){
+            return i;
+        }
+    }
 
-    return 0;
+    return -1;
+
 }
 
 /******************************************************************************
