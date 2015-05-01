@@ -138,6 +138,9 @@ void GetFirstRoom ( char* output ) {
     readcount = fread( output , sizeof(char) , RMNAMEBUFFSIZE - 1 ,
             stfile );
     output[readcount] = '\0';
+
+    fclose(stfile);
+    remove(STARTFILE);
 }
 
 /******************************************************************************
@@ -250,7 +253,6 @@ void displayRoomPrompt ( char* roomName ) {
         printf( "%s" , prompt );
         fgets( roomName , RMNAMEBUFFSIZE , stdin );
         roomName[strlen( roomName ) - 1] = '\0'; /*remove trailing '\n' */
-        /*todo check what happens when input overflows buff, is it picked up next time*/
     } while ( !isConnection( roomName , connectNames , numConnections ) );
 
 }
@@ -284,6 +286,8 @@ int isEndRoom ( char* roomName ) {
 
     readcount = fread( fileBuff , sizeof(char) , MAXBUFF - 1 , roomFile );
     fileBuff[readcount - 1] = '\0';
+
+    fclose(roomFile);
 
     end = fileBuff + readcount;
     while ( *end != ':' )
