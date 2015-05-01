@@ -189,20 +189,28 @@ void displayRoomPrompt(char* roomName){
         lines[++numLines]=strtok(NULL,"\n");
     }
 
-    int i=1;
-    for(;i<numLines-1;i++){
-        printf("%s",strchr(lines[i],':')+1);
-        if (i == numLines-2) printf("%s",".\n");
+    char* connectNames[MAX_CON];
+    int numConnections = numLines - 2;
+    int i=0;
+    for(;i<numConnections;i++){
+        connectNames[i] = strchr(lines[i+1],':') + sizeof(char);
+        printf("%s",connectNames[i]);
+        if (i == numConnections-1) printf("%s",".\n");
         else putchar(',');
     }
 
     printf("%s",PROMPT);
 
+    fclose(roomFile);
     //////////////////////////////////////
     ///GET USERS NEXT STEP ///// /////////
-    /////////////////////////////////////
+    //////////////////////////////////////
+
+
 
 }
+
+//int isConnection()
 
 int isEndRoom(char* roomName){
     return 0;
